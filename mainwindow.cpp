@@ -59,6 +59,9 @@ void MainWindow::moveCursor(int lineNum) {
     cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, lineNum);
     ui->bibleText->setTextCursor(cursor);
     ui->bibleText->centerCursor();
+
+    cursor.select(QTextCursor::LineUnderCursor);
+    ui->bibleText->setTextCursor(cursor);
 }
 
 void MainWindow::searchGui() {

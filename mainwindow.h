@@ -21,7 +21,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void closeEvent(QCloseEvent*);
+    void closeEvent(QCloseEvent *event);
 
 public slots:
     void loadBible();
