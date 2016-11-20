@@ -34,7 +34,7 @@
      <number>4</number>
     </property>
     <item>
-     <widget class="QPlainTextEdit" name="bibleText"/>
+     <widget class="QTextEdit" name="bibleText"/>
     </item>
    </layout>
   </widget>

@@ -54,12 +54,20 @@ void MainWindow::loadBible() {
 }
 
 void MainWindow::moveCursor(int lineNum) {
+    int useLine = lineNum;
+    if(useLine != 0) {
+        useLine -= 1;
+    }
+    //scroll to bottom then back up to have selected line on the top of the screen
     QTextCursor cursor = ui->bibleText->textCursor();
+    cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+    ui->bibleText->setTextCursor(cursor);
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    //scroll to the line before the one selected
+    cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, useLine);
+    ui->bibleText->setTextCursor(cursor);
     cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, lineNum);
-    ui->bibleText->setTextCursor(cursor);
-    ui->bibleText->centerCursor();
-
     cursor.select(QTextCursor::LineUnderCursor);
     ui->bibleText->setTextCursor(cursor);
 }
