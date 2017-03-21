@@ -17,8 +17,16 @@ TextSec BibleRec::getText(int start, int end) {
 	return curText->getList(start, end);
 }
 
+TextSec BibleRec::getBookText(int bookNum) {
+    return curText->getList(curIdx->getBook(bookNum).getStartLine(), curIdx->getBook(bookNum).getEndLine());
+}
+
 vector<string> BibleRec::getBookList() {
 	return curIdx->getList();
+}
+
+int BibleRec::getBookNum() {
+    return curIdx->getBookNum();
 }
 
 Book BibleRec::getBookInfo(int bookId) {
@@ -48,17 +56,19 @@ Location BibleRec::getLocation(int lineNum) {
 
 BibleText::BibleText(string textPath) {
 	ifstream ins;
-	ins.open(textPath.c_str());
+    cout << textPath.c_str() << endl;
+    ins.open(textPath.c_str());
     ins.clear();
 
-	//read by line and push into list
+    //read by line and push into list
     while(ins.good()) {
-		char buffer[512];
+        char buffer[512];
         ins.getline(buffer, 512, '\n');
-		string temp = buffer;
-		lineList.push_back(buffer);
-		numLines++;
-	}
+        string temp = buffer;
+        cout << buffer << endl;
+        lineList.push_back(buffer);
+        numLines++;
+    }
 }
 
 BibleText::~BibleText() {
@@ -128,6 +138,10 @@ vector<string> BibleIdx::getList() {
 		newList.push_back(bookList.at(i).getName());
 	}
 	return newList;
+}
+
+int BibleIdx::getBookNum() {
+    return numBooks;
 }
 
 Book BibleIdx::getBook(int id) {

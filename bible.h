@@ -57,6 +57,7 @@ public:
 	BibleIdx(string);
 	~BibleIdx();
 	vector<string> getList();
+    int getBookNum();
 	Book getBook(int);
 	Location getLocation(int);
 private:
@@ -69,8 +70,12 @@ public:
 	BibleRec(string, string);	//biblepath, indexpath
 	~BibleRec();
 	TextSec getText(int, int);
+    TextSec getBookText(int);
+
 	vector<string> getBookList();
+    int getBookNum();
 	Book getBookInfo(int);
+
     vector<int> searchPhrase(string, int, int);
 	Location getLocation(int);
 private:

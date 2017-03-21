@@ -15,8 +15,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->bibleText->setReadOnly(true);
 
     //setup actions
+    this->bookState = 0;
+
+    ui->bookLabel->setText("");
+
     connect(ui->openBible, SIGNAL(triggered()), this, SLOT(loadBible()));
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
+
+    connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
+    connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));
 }
 
 MainWindow::~MainWindow() {
@@ -34,23 +41,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::loadBible() {
     string name = "niv";
-    curBible = new BibleRec("./" + name + ".txt", "./" + name + ".idx");
+    curBible = new BibleRec(name + ".txt", "./" + name + ".idx");
     cout << "Loading Bible..." << endl;
 
-    QTextBlockFormat format;
-    format.setLineHeight(0, QTextBlockFormat::SingleHeight);
-
-    QTextCursor curs = ui->bibleText->textCursor();
-    curs.setBlockFormat(format);
-
-    TextSec entireText = curBible->getText(0, 0);
-    QString temp;
-    for(int i = 0; i < entireText.len; ++i) {
-        temp = (entireText.sec.at(i)).c_str();
-        curs.insertText(temp);
-    }
-
-    moveCursor(0);
+    this->changeBook();
 }
 
 void MainWindow::moveCursor(int lineNum) {
@@ -112,7 +106,15 @@ void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLo
 
 void MainWindow::matchSelected(int lineNum) {
     cout << lineNum << endl;
-    moveCursor(lineNum);
+
+    Location newLoc = this->curBible->getLocation(lineNum);
+    cout << newLoc.bookIdx << endl;
+    bookState = newLoc.bookIdx;
+    this->changeBook();
+
+    int relLineNum = lineNum - curBible->getBookInfo(bookState).getStartLine();
+
+    moveCursor(relLineNum);
     delete resultsWindow;
     resultsWindow = NULL;
 }
@@ -120,5 +122,56 @@ void MainWindow::matchSelected(int lineNum) {
 void MainWindow::resultsClose() {
     delete resultsWindow;
     resultsWindow = NULL;
+}
+
+void MainWindow::nextBook() {
+    if(this->curBible) {
+        //change the state
+        if(this->bookState < this->curBible->getBookNum()-1) {
+            this->bookState++;
+        }
+
+        cout << this->bookState << endl;
+        this->changeBook();
+    }
+
+
+}
+
+void MainWindow::prevBook() {
+    if(this->curBible) {
+        //change the state
+        if(this->bookState > 0) {
+            this->bookState--;
+        }
+
+        cout << this->bookState << endl;
+        this->changeBook();
+    }
+}
+
+void MainWindow::changeBook() {
+    //edit the label
+    QString bookName = this->curBible->getBookInfo(bookState).getName().c_str();
+    ui->bookLabel->setText(bookName);
+
+    //set the new text
+    ui->bibleText->clear();
+
+    QTextBlockFormat format;
+    format.setLineHeight(0, QTextBlockFormat::SingleHeight);
+
+    QTextCursor curs = ui->bibleText->textCursor();
+    curs.setBlockFormat(format);
+
+    //show book
+    TextSec newBook = curBible->getBookText(bookState);
+    QString temp;
+    for(int i = 0; i < newBook.len; ++i) {
+        temp = (newBook.sec.at(i)).c_str();
+        curs.insertText(temp);
+    }
+
+    moveCursor(0);
 }
 

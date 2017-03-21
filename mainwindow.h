@@ -31,12 +31,19 @@ public slots:
     void matchSelected(int);
     void resultsClose();
 
+    void nextBook();
+    void prevBook();
+
 private:
     void moveCursor(int);
+    void changeBook();
     Ui::MainWindow *ui;
     SearchDiag *searchWindow = NULL;
     ResultsDiag *resultsWindow = NULL;
     BibleRec *curBible = NULL;
+
+    //remembers the current book displayed
+    int bookState;
 };
 
 #endif // MAINWINDOW_H
