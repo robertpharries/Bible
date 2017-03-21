@@ -26,6 +26,7 @@ public slots:
     void setToVerses(int);
 
 private:
+    void closeEvent(QCloseEvent*);
     Ui::SearchDiag *ui;
 
     BibleRec *curBible = NULL;

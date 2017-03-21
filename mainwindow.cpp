@@ -17,13 +17,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //setup actions
     this->bookState = 0;
 
-    ui->bookLabel->setText("");
-
     connect(ui->openBible, SIGNAL(triggered()), this, SLOT(loadBible()));
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
     connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));
+
+    connect(ui->bookSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(manualBookSelect(int)));
 }
 
 MainWindow::~MainWindow() {
@@ -43,6 +43,15 @@ void MainWindow::loadBible() {
     string name = "niv";
     curBible = new BibleRec(name + ".txt", "./" + name + ".idx");
     cout << "Loading Bible..." << endl;
+
+    vector<string> bookList = curBible->getBookList();
+    QStringList qbookList;
+
+    foreach(string str, bookList) {
+        qbookList.push_back(str.c_str());
+    }
+
+    ui->bookSelector->addItems(qbookList);
 
     this->changeBook();
 }
@@ -76,6 +85,7 @@ void MainWindow::searchGui() {
 }
 
 void MainWindow::searchClose() {
+    cout << "closing search" << endl;
     delete searchWindow;
     searchWindow = NULL;
 }
@@ -134,8 +144,6 @@ void MainWindow::nextBook() {
         cout << this->bookState << endl;
         this->changeBook();
     }
-
-
 }
 
 void MainWindow::prevBook() {
@@ -153,7 +161,7 @@ void MainWindow::prevBook() {
 void MainWindow::changeBook() {
     //edit the label
     QString bookName = this->curBible->getBookInfo(bookState).getName().c_str();
-    ui->bookLabel->setText(bookName);
+    ui->bookSelector->setCurrentIndex(bookState);
 
     //set the new text
     ui->bibleText->clear();
@@ -173,5 +181,10 @@ void MainWindow::changeBook() {
     }
 
     moveCursor(0);
+}
+
+void MainWindow::manualBookSelect(int index) {
+    bookState = index;
+    changeBook();
 }
 

@@ -25,6 +25,8 @@ public slots:
     void cancel();
 
 private:
+    void closeEvent(QCloseEvent *);
+
     Ui::ResultsDiag *ui;
     BibleRec *curBible = NULL;
     vector<int> *resultsList = NULL;

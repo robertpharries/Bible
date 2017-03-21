@@ -30,6 +30,7 @@ public slots:
     void searchPhrase(QString*, Location*, Location*);
     void matchSelected(int);
     void resultsClose();
+    void manualBookSelect(int);
 
     void nextBook();
     void prevBook();

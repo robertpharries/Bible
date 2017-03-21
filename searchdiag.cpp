@@ -56,6 +56,10 @@ void SearchDiag::doCancel() {
     emit closedSignalNP();
 }
 
+void SearchDiag::closeEvent(QCloseEvent *e) {
+    emit closedSignalNP();
+}
+
 void SearchDiag::setFromChapters(int bookNum) {
     Book newBook = curBible->getBookInfo(bookNum);
     ui->fromChp->setRange(1, newBook.getNumChapt());

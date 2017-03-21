@@ -90,3 +90,7 @@ void ResultsDiag::select() {
 void ResultsDiag::cancel() {
     emit cancelSignal();
 }
+
+void ResultsDiag::closeEvent(QCloseEvent *e) {
+    emit cancelSignal();
+}
