@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(ui->openBible, SIGNAL(triggered()), this, SLOT(loadBible()));
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
+    connect(ui->goTo, SIGNAL(triggered()), this, SLOT(gotoGui()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
     connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));
@@ -36,6 +37,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         searchWindow->close();
     if(resultsWindow)
         resultsWindow->close();
+    if(gotoWindow)
+        gotoWindow->close();
     event->accept();
 }
 
@@ -57,6 +60,7 @@ void MainWindow::loadBible() {
 }
 
 void MainWindow::moveCursor(int lineNum) {
+    cout << "mvoing to: " << lineNum << endl;
     int useLine = lineNum;
     if(useLine != 0) {
         useLine -= 1;
@@ -73,6 +77,7 @@ void MainWindow::moveCursor(int lineNum) {
     cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, lineNum);
     cursor.select(QTextCursor::LineUnderCursor);
     ui->bibleText->setTextCursor(cursor);
+    cout << QTextCursor::End << endl;
 }
 
 void MainWindow::searchGui() {
@@ -85,7 +90,6 @@ void MainWindow::searchGui() {
 }
 
 void MainWindow::searchClose() {
-    cout << "closing search" << endl;
     delete searchWindow;
     searchWindow = NULL;
 }
@@ -124,7 +128,7 @@ void MainWindow::matchSelected(int lineNum) {
 
     int relLineNum = lineNum - curBible->getBookInfo(bookState).getStartLine();
 
-    moveCursor(relLineNum);
+    this->moveCursor(relLineNum);
     delete resultsWindow;
     resultsWindow = NULL;
 }
@@ -132,6 +136,36 @@ void MainWindow::matchSelected(int lineNum) {
 void MainWindow::resultsClose() {
     delete resultsWindow;
     resultsWindow = NULL;
+}
+
+void MainWindow::gotoGui() {
+    if(!gotoWindow) {
+        gotoWindow = new gotodiag(0, this->curBible);
+        connect(gotoWindow, SIGNAL(closedSignal(Location*)), this, SLOT(gotoLocation(Location*)));
+        connect(gotoWindow, SIGNAL(closedSignalNP()), this, SLOT(gotoClose()));
+        gotoWindow->show();
+    }
+}
+
+void MainWindow::gotoClose() {
+    delete gotoWindow;
+    gotoWindow = NULL;
+}
+
+void MainWindow::gotoLocation(Location* newLoc) {
+    bookState = newLoc->bookIdx;
+    this->changeBook();
+
+    cout << newLoc->lineNum << endl;
+    cout << curBible->getBookInfo(bookState).getStartLine() << endl;
+
+    int relLineNum = newLoc->lineNum - curBible->getBookInfo(bookState).getStartLine();
+
+    cout << relLineNum << endl;
+
+    this->moveCursor(relLineNum);
+    delete gotoWindow;
+    gotoWindow = NULL;
 }
 
 void MainWindow::nextBook() {
@@ -189,12 +223,13 @@ void MainWindow::changeBook() {
 
         cout << line << endl;
 
+        temp.append("<p>");
         temp.append(line.c_str());
-        temp.append("<br>");
+        temp.append("</p>");
     }
     curs.insertHtml(temp);
 
-    moveCursor(0);
+    this->moveCursor(0);
 }
 
 void MainWindow::manualBookSelect(int index) {

@@ -7,7 +7,7 @@
 QT       += core gui
 QT += webkitwidgets
 
-CONFIG += console
+#CONFIG += console
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,15 +19,18 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     bible.cpp \
     searchdiag.cpp \
-    resultsdiag.cpp
+    resultsdiag.cpp \
+    gotodiag.cpp
 
 HEADERS  += mainwindow.h \
     bible.h \
     searchdiag.h \
-    resultsdiag.h
+    resultsdiag.h \
+    gotodiag.h
 
 FORMS    += mainwindow.ui \
     searchdiag.ui \
-    resultsdiag.ui
+    resultsdiag.ui \
+    gotodiag.ui
 
 DISTFILES +=

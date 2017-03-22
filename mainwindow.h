@@ -7,6 +7,7 @@
 #include <QCloseEvent>
 #include "searchdiag.h"
 #include "resultsdiag.h"
+#include "gotodiag.h"
 #include "bible.h"
 
 namespace Ui {
@@ -32,6 +33,10 @@ public slots:
     void resultsClose();
     void manualBookSelect(int);
 
+    void gotoGui();
+    void gotoClose();
+    void gotoLocation(Location*);
+
     void nextBook();
     void prevBook();
 
@@ -41,6 +46,8 @@ private:
     Ui::MainWindow *ui;
     SearchDiag *searchWindow = NULL;
     ResultsDiag *resultsWindow = NULL;
+    gotodiag *gotoWindow = NULL;
+
     BibleRec *curBible = NULL;
 
     //remembers the current book displayed

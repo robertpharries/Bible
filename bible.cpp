@@ -79,6 +79,9 @@ TextSec BibleText::getList(int start, int end) {
     if(end == 0 || end > numLines)
         end = numLines;
 
+    if(start < 0)
+        start = 0;
+
 	vector<string> selection;
 
 	for(int i = start; i < end; ++i) {
