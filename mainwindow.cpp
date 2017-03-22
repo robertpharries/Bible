@@ -175,10 +175,24 @@ void MainWindow::changeBook() {
     //show book
     TextSec newBook = curBible->getBookText(bookState);
     QString temp;
+
     for(int i = 0; i < newBook.len; ++i) {
-        temp = (newBook.sec.at(i)).c_str();
-        curs.insertText(temp);
+        string line = newBook.sec.at(i);
+        line.insert(0, "<sup>");
+
+        for(int n = 5; n < 10; n++) {
+            if(!isdigit((line.at(n)))) {
+                line.insert(n, "</sup>");
+                break;
+            }
+        }
+
+        cout << line << endl;
+
+        temp.append(line.c_str());
+        temp.append("<br>");
     }
+    curs.insertHtml(temp);
 
     moveCursor(0);
 }
