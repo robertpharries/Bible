@@ -216,13 +216,15 @@ void MainWindow::changeBook() {
     TextSec newBook = curBible->getBookText(bookState);
     QString temp;
 
+    string tag = "<v style='color:#a40013'>";
+
     for(int i = 0; i < newBook.len; ++i) {
         string line = newBook.sec.at(i);
-        line.insert(0, "<sup>");
+        line.insert(0, tag);
 
-        for(int n = 5; n < 10; n++) {
-            if(!isdigit((line.at(n)))) {
-                line.insert(n, "</sup>");
+        for(int n = tag.length(); n < tag.length()+10; n++) {
+            if(!(isdigit((line.at(n))) || line.at(n) == ':')) {
+                line.insert(n, " </v>");
                 break;
             }
         }
