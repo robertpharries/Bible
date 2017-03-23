@@ -5,9 +5,11 @@
 #include <QMessageBox>
 #include <QTextBlock>
 #include <QCloseEvent>
+#include <vector>
 #include "searchdiag.h"
 #include "resultsdiag.h"
 #include "gotodiag.h"
+#include "fontdialog.h"
 #include "bible.h"
 
 namespace Ui {
@@ -40,6 +42,10 @@ public slots:
     void nextBook();
     void prevBook();
 
+    void fontGui();
+    void fontClose();
+    void setFont(QString, int);
+
 private:
     void moveCursor(int);
     void changeBook();
@@ -47,11 +53,15 @@ private:
     SearchDiag *searchWindow = NULL;
     ResultsDiag *resultsWindow = NULL;
     gotodiag *gotoWindow = NULL;
+    FontDialog *fontWindow = NULL;
 
     BibleRec *curBible = NULL;
 
     //remembers the current book displayed
     int bookState;
+
+    //list of fonts availble
+    std::vector<QString> fonts;
 };
 
 #endif // MAINWINDOW_H

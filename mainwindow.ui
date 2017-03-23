@@ -144,6 +144,8 @@
      <string>Edit</string>
     </property>
     <addaction name="copySelection"/>
+    <addaction name="separator"/>
+    <addaction name="fontSettings"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -192,6 +194,11 @@
   <action name="copySelection">
    <property name="text">
     <string>Copy Selection</string>
+   </property>
+  </action>
+  <action name="fontSettings">
+   <property name="text">
+    <string>Font Settings</string>
    </property>
   </action>
  </widget>

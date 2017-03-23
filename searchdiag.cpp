@@ -15,7 +15,7 @@ SearchDiag::SearchDiag(QWidget *parent, BibleRec *newBible) : QDialog(parent), u
 
     vector<string> bookList = curBible->getBookList();
 
-    for(int i =  0; i < bookList.size(); i++) {
+    for(int i = 0; i < bookList.size(); i++) {
         ui->fromBook->addItem(QString::fromStdString(bookList.at(i)));
         ui->toBook->addItem(QString::fromStdString(bookList.at(i)));
     }

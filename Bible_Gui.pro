@@ -20,17 +20,20 @@ SOURCES += main.cpp\
     bible.cpp \
     searchdiag.cpp \
     resultsdiag.cpp \
-    gotodiag.cpp
+    gotodiag.cpp \
+    fontdialog.cpp
 
 HEADERS  += mainwindow.h \
     bible.h \
     searchdiag.h \
     resultsdiag.h \
-    gotodiag.h
+    gotodiag.h \
+    fontdialog.h
 
 FORMS    += mainwindow.ui \
     searchdiag.ui \
     resultsdiag.ui \
-    gotodiag.ui
+    gotodiag.ui \
+    fontdialog.ui
 
 DISTFILES +=

@@ -17,9 +17,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //setup actions
     this->bookState = 0;
 
+    this->fonts.push_back(QString("Arial"));
+    this->fonts.push_back(QString("Courier New"));
+    this->fonts.push_back(QString("Helvetica"));
+    this->fonts.push_back(QString("Times New Roman"));
+
     connect(ui->openBible, SIGNAL(triggered()), this, SLOT(loadBible()));
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
     connect(ui->goTo, SIGNAL(triggered()), this, SLOT(gotoGui()));
+    connect(ui->fontSettings, SIGNAL(triggered()), this, SLOT(fontGui()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
     connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));
@@ -235,5 +241,34 @@ void MainWindow::changeBook() {
 void MainWindow::manualBookSelect(int index) {
     bookState = index;
     changeBook();
+}
+
+void MainWindow::fontGui() {
+    if(!fontWindow) {
+        fontWindow = new FontDialog(0, &this->fonts);
+        connect(fontWindow, SIGNAL(closedSignal(QString,int)), this, SLOT(setFont(QString,int)));
+        connect(fontWindow, SIGNAL(closedSignalNP()), this, SLOT(fontClose()));
+        fontWindow->show();
+    }
+}
+
+void MainWindow::fontClose() {
+    if(fontWindow) {
+        delete fontWindow;
+        fontWindow = NULL;
+    }
+}
+
+void MainWindow::setFont(QString fontFamily, int fontSize) {
+    QFont font;
+    font.setFamily(fontFamily);
+    font.setPointSize(fontSize);
+
+    ui->bibleText->setFont(font);
+
+    if(fontWindow) {
+        delete fontWindow;
+        fontWindow = NULL;
+    }
 }
 
