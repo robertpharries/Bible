@@ -49,24 +49,40 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::loadBible() {
-    string name = "niv";
-    curBible = new BibleRec(name + ".txt", "./" + name + ".idx");
-    cout << "Loading Bible..." << endl;
+//    string name = "niv";
+//    curBible = new BibleRec(name + ".txt", "./" + name + ".idx");
 
-    vector<string> bookList = curBible->getBookList();
-    QStringList qbookList;
+    QString filter = "Bible Text File (*.btx)";
+    QString selection = QFileDialog::getOpenFileName(this, "Select a Bible text", QDir::currentPath(),filter);
+    string str = selection.toStdString();
 
-    foreach(string str, bookList) {
-        qbookList.push_back(str.c_str());
+    std::size_t found = str.find_last_of(".");
+    string path = str.substr(0, found);
+
+    if(str.length() > 4) {
+        BibleRec* newBible = new BibleRec(path + ".btx", path + ".idx");
+
+        vector<string>* bookList = newBible->getBookList();
+
+        if(bookList) {
+            if(curBible)
+                delete curBible;
+            curBible = newBible;
+
+            foreach(string str, *bookList) {
+                ui->bookSelector->addItem(QString(str.c_str()));
+            }
+
+            bookState = 0;
+
+            this->changeBook();
+        } else {
+            QMessageBox::information(this, "Bible Selection Invalid...", "Bible text selected is not valid");
+        }
     }
-
-    ui->bookSelector->addItems(qbookList);
-
-    this->changeBook();
 }
 
 void MainWindow::moveCursor(int lineNum) {
-    cout << "mvoing to: " << lineNum << endl;
     int useLine = lineNum;
     if(useLine != 0) {
         useLine -= 1;
@@ -87,7 +103,7 @@ void MainWindow::moveCursor(int lineNum) {
 }
 
 void MainWindow::searchGui() {
-    if(!searchWindow) {
+    if(!searchWindow && curBible) {
         searchWindow = new SearchDiag(0, this->curBible);
         connect(searchWindow, SIGNAL(closedSignal(QString*, Location*, Location*)), this, SLOT(searchPhrase(QString*, Location*, Location*)));
         connect(searchWindow, SIGNAL(closedSignalNP()), this, SLOT(searchClose()));
@@ -145,7 +161,7 @@ void MainWindow::resultsClose() {
 }
 
 void MainWindow::gotoGui() {
-    if(!gotoWindow) {
+    if(!gotoWindow && curBible) {
         gotoWindow = new gotodiag(0, this->curBible);
         connect(gotoWindow, SIGNAL(closedSignal(Location*)), this, SLOT(gotoLocation(Location*)));
         connect(gotoWindow, SIGNAL(closedSignalNP()), this, SLOT(gotoClose()));
@@ -199,45 +215,45 @@ void MainWindow::prevBook() {
 }
 
 void MainWindow::changeBook() {
-    //edit the label
-    QString bookName = this->curBible->getBookInfo(bookState).getName().c_str();
-    ui->bookSelector->setCurrentIndex(bookState);
+    if(curBible) {
+        //edit the label
+        QString bookName = this->curBible->getBookInfo(bookState).getName().c_str();
+        ui->bookSelector->setCurrentIndex(bookState);
 
-    //set the new text
-    ui->bibleText->clear();
+        //set the new text
+        ui->bibleText->clear();
 
-    QTextBlockFormat format;
-    format.setLineHeight(0, QTextBlockFormat::SingleHeight);
+        QTextBlockFormat format;
+        format.setLineHeight(0, QTextBlockFormat::SingleHeight);
 
-    QTextCursor curs = ui->bibleText->textCursor();
-    curs.setBlockFormat(format);
+        QTextCursor curs = ui->bibleText->textCursor();
+        curs.setBlockFormat(format);
 
-    //show book
-    TextSec newBook = curBible->getBookText(bookState);
-    QString temp;
+        //show book
+        TextSec newBook = curBible->getBookText(bookState);
+        QString temp;
 
-    string tag = "<v style='color:#a40013'>";
+        string tag = "<v style='color:#a40013'>";
 
-    for(int i = 0; i < newBook.len; ++i) {
-        string line = newBook.sec.at(i);
-        line.insert(0, tag);
+        for(int i = 0; i < newBook.len; ++i) {
+            string line = newBook.sec.at(i);
+            line.insert(0, tag);
 
-        for(int n = tag.length(); n < tag.length()+10; n++) {
-            if(!(isdigit((line.at(n))) || line.at(n) == ':')) {
-                line.insert(n, " </v>");
-                break;
+            for(int n = tag.length(); n < tag.length()+10; n++) {
+                if(!(isdigit((line.at(n))) || line.at(n) == ':')) {
+                    line.insert(n, " </v>");
+                    break;
+                }
             }
+
+            temp.append("<p>");
+            temp.append(line.c_str());
+            temp.append("</p>");
         }
+        curs.insertHtml(temp);
 
-        cout << line << endl;
-
-        temp.append("<p>");
-        temp.append(line.c_str());
-        temp.append("</p>");
+        this->moveCursor(0);
     }
-    curs.insertHtml(temp);
-
-    this->moveCursor(0);
 }
 
 void MainWindow::manualBookSelect(int index) {

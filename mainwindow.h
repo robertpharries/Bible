@@ -6,6 +6,7 @@
 #include <QTextBlock>
 #include <QCloseEvent>
 #include <vector>
+#include <QFileDialog>
 #include "searchdiag.h"
 #include "resultsdiag.h"
 #include "gotodiag.h"

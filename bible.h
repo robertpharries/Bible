@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <locale>
+#include <cstring>
 using namespace std;
 
 struct TextSec {
@@ -56,7 +57,7 @@ class BibleIdx {
 public:
 	BibleIdx(string);
 	~BibleIdx();
-	vector<string> getList();
+    vector<string>* getList();
     int getBookNum();
 	Book getBook(int);
 	Location getLocation(int);
@@ -72,7 +73,7 @@ public:
 	TextSec getText(int, int);
     TextSec getBookText(int);
 
-	vector<string> getBookList();
+    vector<string>* getBookList();
     int getBookNum();
 	Book getBookInfo(int);
 

@@ -22,10 +22,10 @@ void outputSelection(BibleRec* curBible, int start, int end) {
 }
 
 void outputIndex(BibleRec* curBible) {
-    vector<string> nameList = curBible->getBookList();
+    vector<string>* nameList = curBible->getBookList();
 
-    for(int i = 0; i < nameList.size(); ++i) {
-        cout << nameList.at(i) << endl;
+    for(int i = 0; i < nameList->size(); ++i) {
+        cout << nameList->at(i) << endl;
         Book curBook = curBible->getBookInfo(i);
         cout << "chapters: " << curBook.getNumChapt() << endl;
         for(int i = 0; i < curBook.getNumChapt(); ++i) {

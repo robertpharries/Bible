@@ -11,10 +11,10 @@ gotodiag::gotodiag(QWidget *parent, BibleRec *newBible) :  QDialog(parent), ui(n
     connect(ui->goBook, SIGNAL(currentIndexChanged(int)), this, SLOT(setFromChapters(int)));
     connect(ui->goChp, SIGNAL(valueChanged(int)), this, SLOT(setFromVerses(int)));
 
-    vector<string> bookList = curBible->getBookList();
+    vector<string>* bookList = curBible->getBookList();
 
-    for(int i =  0; i < bookList.size(); i++) {
-        ui->goBook->addItem(QString::fromStdString(bookList.at(i)));
+    for(int i =  0; i < bookList->size(); i++) {
+        ui->goBook->addItem(QString::fromStdString(bookList->at(i)));
     }
 
     ui->goBook->setCurrentIndex(0);

@@ -13,15 +13,15 @@ SearchDiag::SearchDiag(QWidget *parent, BibleRec *newBible) : QDialog(parent), u
     connect(ui->fromChp, SIGNAL(valueChanged(int)), this, SLOT(setFromVerses(int)));
     connect(ui->toChp, SIGNAL(valueChanged(int)), this, SLOT(setToVerses(int)));
 
-    vector<string> bookList = curBible->getBookList();
+    vector<string>* bookList = curBible->getBookList();
 
-    for(int i = 0; i < bookList.size(); i++) {
-        ui->fromBook->addItem(QString::fromStdString(bookList.at(i)));
-        ui->toBook->addItem(QString::fromStdString(bookList.at(i)));
+    for(int i = 0; i < bookList->size(); i++) {
+        ui->fromBook->addItem(QString::fromStdString(bookList->at(i)));
+        ui->toBook->addItem(QString::fromStdString(bookList->at(i)));
     }
 
     ui->fromBook->setCurrentIndex(0);
-    ui->toBook->setCurrentIndex(bookList.size()-1);
+    ui->toBook->setCurrentIndex(bookList->size()-1);
     ui->toChp->setValue(ui->toChp->maximum());
     ui->toVrs->setValue(ui->toVrs->maximum());
 }

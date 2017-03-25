@@ -21,7 +21,7 @@ TextSec BibleRec::getBookText(int bookNum) {
     return curText->getList(curIdx->getBook(bookNum).getStartLine(), curIdx->getBook(bookNum).getEndLine());
 }
 
-vector<string> BibleRec::getBookList() {
+vector<string>* BibleRec::getBookList() {
 	return curIdx->getList();
 }
 
@@ -59,13 +59,12 @@ BibleText::BibleText(string textPath) {
     cout << textPath.c_str() << endl;
     ins.open(textPath.c_str());
     ins.clear();
+    char buffer[512];
 
     //read by line and push into list
     while(ins.good()) {
-        char buffer[512];
         ins.getline(buffer, 512, '\n');
         string temp = buffer;
-        cout << buffer << endl;
         lineList.push_back(buffer);
         numLines++;
     }
@@ -104,43 +103,51 @@ int BibleText::getListLen() {
 //BibleIdx
 
 BibleIdx::BibleIdx(string idxPath) {
-	ifstream ins;
-	ins.open(idxPath.c_str());
+    try {
+        ifstream ins;
+        ins.open(idxPath.c_str());
 
-	ins >> numBooks;
+        ins >> numBooks;
 
-	int totalLines = 0;
-	for(int i = 0; i < numBooks; ++i) {
-		int numChapters, verses;
-		int lineCount = 0;
-		vector<int> numVerses;
+        int totalLines = 0;
+        for(int i = 0; i < numBooks; ++i) {
+            int numChapters, verses;
+            int lineCount = 0;
+            vector<int> numVerses;
 
-		char tempName[64];
-		ins.ignore();
-		ins.getline(tempName, 64, '\n');
-		string name = tempName;
-		ins >> numChapters;
-		for(int n = 0; n < numChapters; ++n) {
-			ins >> verses;
-			lineCount += verses;
-			numVerses.push_back(verses);
-		}
-		Book newBook(name, numChapters, totalLines, totalLines + lineCount, numVerses);
-		totalLines += lineCount;
-		bookList.push_back(newBook);
-	}
+            char tempName[64];
+            ins.ignore();
+            ins.getline(tempName, 64, '\n');
+            string name = tempName;
+            ins >> numChapters;
+            for(int n = 0; n < numChapters; ++n) {
+                ins >> verses;
+                lineCount += verses;
+                numVerses.push_back(verses);
+            }
+            Book newBook(name, numChapters, totalLines, totalLines + lineCount, numVerses);
+            totalLines += lineCount;
+            bookList.push_back(newBook);
+        }
+    } catch(exception e) {
+        cout << "index read borked" << endl;
+    }
 }
 
 BibleIdx::~BibleIdx() {
 
 }
 
-vector<string> BibleIdx::getList() {
-	vector<string> newList;
-	for(int i = 0; i < numBooks; ++i) {
-		newList.push_back(bookList.at(i).getName());
-	}
-	return newList;
+vector<string>* BibleIdx::getList() {
+    if(numBooks == 0) {
+        return NULL;
+    } else {
+        vector<string> *newList = new vector<string>;
+        for(int i = 0; i < numBooks; ++i) {
+            newList->push_back(bookList.at(i).getName());
+        }
+        return newList;
+    }
 }
 
 int BibleIdx::getBookNum() {
