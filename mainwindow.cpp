@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->bibleText->setReadOnly(true);
 
+    this->loadConf();
+
     //setup actions
     this->bookState = 0;
 
@@ -34,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
+    this->saveConf();
     delete curBible;
     delete ui;
 }
@@ -99,7 +102,6 @@ void MainWindow::moveCursor(int lineNum) {
     cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, lineNum);
     cursor.select(QTextCursor::LineUnderCursor);
     ui->bibleText->setTextCursor(cursor);
-    cout << QTextCursor::End << endl;
 }
 
 void MainWindow::searchGui() {
@@ -290,3 +292,26 @@ void MainWindow::setFont(QString fontFamily, int fontSize) {
     }
 }
 
+void MainWindow::loadConf() {
+    ifstream confins;
+    QFont font;
+    confins.open("Bible_Gui.conf");
+
+    char buffer[128];
+    confins.getline(buffer, 128, '\n');
+
+    font.setFamily(QString(buffer));
+
+    confins.getline(buffer, 128, '\n');
+    font.setPointSize(atoi(buffer));
+
+    ui->bibleText->setFont(font);
+}
+
+void MainWindow::saveConf() {
+    ofstream confos;
+    confos.open("Bible_Gui.conf", ios::trunc);
+
+    confos << ui->bibleText->font().family().toStdString() << '\n' << ui->bibleText->font().pointSize();
+
+}

@@ -47,6 +47,9 @@ public slots:
     void fontClose();
     void setFont(QString, int);
 
+    void saveConf();
+    void loadConf();
+
 private:
     void moveCursor(int);
     void changeBook();
