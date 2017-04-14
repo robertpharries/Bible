@@ -24,6 +24,16 @@ struct Location {
 	int lineNum;
 };
 
+struct SearchTempl {
+    string name;
+    int f_bookIdx;
+    int f_chapter;
+    int f_verse;
+    int t_bookIdx;
+    int t_chapter;
+    int t_verse;
+};
+
 class BibleText {
 public:
 	BibleText(string);

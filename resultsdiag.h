@@ -5,6 +5,7 @@
 #include <QTableWidget>
 #include <string>
 #include <sstream>
+#include <cstdlib>
 #include "bible.h"
 
 namespace Ui {
@@ -22,6 +23,7 @@ public:
 public slots:
     void changePreview();
     void select();
+    void select(int, int);
     void cancel();
 
 private:

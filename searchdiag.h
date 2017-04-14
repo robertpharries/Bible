@@ -14,7 +14,7 @@ class SearchDiag : public QDialog
     Q_OBJECT
 
 public:
-    explicit SearchDiag(QWidget *parent = 0, BibleRec *curBible = NULL);
+    explicit SearchDiag(QWidget *parent = 0, BibleRec *curBible = NULL, std::vector<SearchTempl> *newstempl = NULL);
     ~SearchDiag();
 
 public slots:
@@ -25,12 +25,16 @@ public slots:
     void setFromVerses(int);
     void setToVerses(int);
 
+    void setCustom();
+    void setTempl(int);
+
 private:
     void closeEvent(QCloseEvent*);
     Ui::SearchDiag *ui;
 
     BibleRec *curBible = NULL;
 
+    std::vector<SearchTempl> *stempl = NULL;
 signals:
     void closedSignalNP();
     void closedSignal(QString*, Location*, Location*);

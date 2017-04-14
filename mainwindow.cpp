@@ -106,7 +106,7 @@ void MainWindow::moveCursor(int lineNum) {
 
 void MainWindow::searchGui() {
     if(!searchWindow && curBible) {
-        searchWindow = new SearchDiag(0, this->curBible);
+        searchWindow = new SearchDiag(0, this->curBible, &this->stempls);
         connect(searchWindow, SIGNAL(closedSignal(QString*, Location*, Location*)), this, SLOT(searchPhrase(QString*, Location*, Location*)));
         connect(searchWindow, SIGNAL(closedSignalNP()), this, SLOT(searchClose()));
         searchWindow->show();
@@ -306,6 +306,15 @@ void MainWindow::loadConf() {
     font.setPointSize(atoi(buffer));
 
     ui->bibleText->setFont(font);
+
+    //go load the templates
+    SearchTempl temp;
+    temp = (SearchTempl) {"Entire Bible", 0, 1, 1, 65, 22, 21};
+    stempls.push_back(temp);
+    temp = (SearchTempl) {"Old Testament", 0, 1, 1, 38, 4, 6};
+    stempls.push_back(temp);
+    temp = (SearchTempl) {"New Testament", 39, 1, 1, 65, 22, 21};
+    stempls.push_back(temp);
 }
 
 void MainWindow::saveConf() {

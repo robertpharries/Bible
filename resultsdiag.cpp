@@ -48,7 +48,10 @@ ResultsDiag::ResultsDiag(QWidget *parent, BibleRec *newBible, vector<int> *match
 
     ui->resultTable->resizeColumnsToContents();
 
+    ui->resultNumLabel->setText(QString::number(matched->size()));
+
     connect(ui->resultTable, SIGNAL(itemSelectionChanged()), SLOT(changePreview()));
+    connect(ui->resultTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(select(int, int)));
     connect(ui->selectBtn, SIGNAL(clicked(bool)), SLOT(select()));
     connect(ui->cancelBtn, SIGNAL(clicked(bool)), SLOT(cancel()));
 }
@@ -84,6 +87,12 @@ void ResultsDiag::select() {
     int curRow = index.row();
     int lineNum = resultsList->at(curRow);
     cout << lineNum << endl;
+    emit selectedSignal(lineNum);
+}
+
+void ResultsDiag::select(int row, int col) {
+    cout << row << endl;
+    int lineNum = resultsList->at(row);
     emit selectedSignal(lineNum);
 }
 

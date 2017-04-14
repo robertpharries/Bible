@@ -66,6 +66,8 @@ private:
 
     //list of fonts availble
     std::vector<QString> fonts;
+    //list of search templates
+    std::vector<SearchTempl> stempls;
 };
 
 #endif // MAINWINDOW_H
