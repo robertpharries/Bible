@@ -315,12 +315,38 @@ void MainWindow::loadConf() {
     stempls.push_back(temp);
     temp = (SearchTempl) {"New Testament", 39, 1, 1, 65, 22, 21};
     stempls.push_back(temp);
+
+    confins.getline(buffer, 128, '\n');
+
+    int templNum = atoi(buffer);
+    cout << templNum << endl;
+
+    for(int i = 0; i < templNum; i++) {
+        string name;
+        int a, b, c, d, e, f;
+
+        confins >> name >> a >> b >> c >> d >> e >> f;
+
+        temp = (SearchTempl) {name,a,b,c,d,e,f};
+
+        stempls.push_back(temp);
+    }
+
 }
 
 void MainWindow::saveConf() {
     ofstream confos;
     confos.open("Bible_Gui.conf", ios::trunc);
 
-    confos << ui->bibleText->font().family().toStdString() << '\n' << ui->bibleText->font().pointSize();
+    confos << ui->bibleText->font().family().toStdString() << '\n' << ui->bibleText->font().pointSize() << endl;
 
+    if(stempls.size()-3 > 0) {
+        confos << stempls.size()-3 << endl;
+
+        for(int i = 0; i < stempls.size()-3; i++) {
+            confos << stempls.at(i+3).name << " " << stempls.at(i+3).f_bookIdx << " " << stempls.at(i+3).f_chapter << " " << stempls.at(i+3).f_verse << " "<< stempls.at(i+3).t_bookIdx << " " << stempls.at(i+3).t_chapter << " " << stempls.at(i+3).t_verse << endl;
+        }
+    }
+
+    confos.close();
 }

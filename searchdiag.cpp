@@ -34,6 +34,8 @@ SearchDiag::SearchDiag(QWidget *parent, BibleRec *newBible, std::vector<SearchTe
 
     if(stempl) {
         for(int i = 0; i < stempl->size(); i++) {
+            if(i == 3)
+                ui->searchTempl->insertSeparator(ui->searchTempl->count());
             ui->searchTempl->addItem(QString(stempl->at(i).name.c_str()));
         }
     }
