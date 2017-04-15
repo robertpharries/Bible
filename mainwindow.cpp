@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
     connect(ui->goTo, SIGNAL(triggered()), this, SLOT(gotoGui()));
     connect(ui->fontSettings, SIGNAL(triggered()), this, SLOT(fontGui()));
+    connect(ui->quit, SIGNAL(triggered()), this, SLOT(close()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
     connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));

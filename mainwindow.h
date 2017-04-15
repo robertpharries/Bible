@@ -25,8 +25,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void closeEvent(QCloseEvent *event);
-
 public slots:
     void loadBible();
     void searchGui();
@@ -35,6 +33,8 @@ public slots:
     void matchSelected(int);
     void resultsClose();
     void manualBookSelect(int);
+
+    void closeEvent(QCloseEvent *event);
 
     void gotoGui();
     void gotoClose();
