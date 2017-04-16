@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QCloseEvent>
 #include "bible.h"
+#include "searchtemplnamediag.h"
 
 namespace Ui {
 class SearchDiag;
@@ -28,13 +29,19 @@ public slots:
     void setCustom();
     void setTempl(int);
 
+    void doSaveTempl();
+    void saveClose();
+    void savePhrase(QString*);
+
 private:
+    void loadTempl(int);
     void closeEvent(QCloseEvent*);
     Ui::SearchDiag *ui;
 
     BibleRec *curBible = NULL;
 
     std::vector<SearchTempl> *stempl = NULL;
+    SearchTemplNameDiag *saveDiag = NULL;
 signals:
     void closedSignalNP();
     void closedSignal(QString*, Location*, Location*);
