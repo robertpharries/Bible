@@ -11,6 +11,7 @@
 #include "resultsdiag.h"
 #include "gotodiag.h"
 #include "fontdialog.h"
+#include "managetempldiag.h"
 #include "bible.h"
 
 namespace Ui {
@@ -47,6 +48,9 @@ public slots:
     void fontClose();
     void setFont(QString, int);
 
+    void manageTemplGui();
+    void manageTemplClose();
+
     void saveConf();
     void loadConf();
 
@@ -58,6 +62,7 @@ private:
     ResultsDiag *resultsWindow = NULL;
     gotodiag *gotoWindow = NULL;
     FontDialog *fontWindow = NULL;
+    ManageTemplDiag *manageTemplWindow = NULL;
 
     BibleRec *curBible = NULL;
 

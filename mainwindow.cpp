@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
     connect(ui->goTo, SIGNAL(triggered()), this, SLOT(gotoGui()));
     connect(ui->fontSettings, SIGNAL(triggered()), this, SLOT(fontGui()));
+    connect(ui->manageTempl, SIGNAL(triggered()), this, SLOT(manageTemplGui()));
     connect(ui->quit, SIGNAL(triggered()), this, SLOT(close()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
@@ -293,6 +294,21 @@ void MainWindow::setFont(QString fontFamily, int fontSize) {
     }
 }
 
+void MainWindow::manageTemplGui() {
+    if(!manageTemplWindow) {
+        manageTemplWindow = new ManageTemplDiag(0, curBible, &stempls);
+        connect(manageTemplWindow, SIGNAL(closedSignalNP()), this, SLOT(manageTemplClose()));
+        manageTemplWindow->show();
+    }
+}
+
+void MainWindow::manageTemplClose() {
+    if(manageTemplWindow) {
+        delete manageTemplWindow;
+        manageTemplWindow = NULL;
+    }
+}
+
 void MainWindow::loadConf() {
     ifstream confins;
     QFont font;
@@ -320,7 +336,6 @@ void MainWindow::loadConf() {
     confins.getline(buffer, 128, '\n');
 
     int templNum = atoi(buffer);
-    cout << templNum << endl;
 
     for(int i = 0; i < templNum; i++) {
         string name;

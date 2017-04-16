@@ -51,6 +51,10 @@ Location BibleRec::getLocation(int lineNum) {
 	return curIdx->getLocation(lineNum);
 }
 
+Location BibleRec::getLocation(int bookIdx, int chapt, int verse) {
+    return curIdx->getLocation(bookIdx, chapt, verse);
+}
+
 
 //BibleText
 
@@ -173,6 +177,10 @@ Location BibleIdx::getLocation(int id) {
 	return curLoc;
 }
 
+Location BibleIdx::getLocation(int bookIdx, int chapt, int verse) {
+    return bookList.at(bookIdx).getLocation(bookIdx, chapt, verse);
+}
+
 
 //Book
 
@@ -235,5 +243,9 @@ int Book::getLineNum(Location curLoc) {
     lineNum += curLoc.verse;
 
     return lineNum;
+}
+
+Location Book::getLocation(int bookIdx, int chapt, int verse) {
+    return (Location) {bookIdx, name, chapt, verse, getLineNum((Location) {bookIdx, "", chapt-1, verse-1, 0})};
 }
 
