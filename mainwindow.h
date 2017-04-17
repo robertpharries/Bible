@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QTextBlock>
 #include <QCloseEvent>
+#include <QScrollBar>
 #include <vector>
 #include <QFileDialog>
 #include "searchdiag.h"
@@ -29,21 +30,24 @@ public:
 public slots:
     void openNewWindow();
 
-    void loadBible();
+    void loadBible();    
     void searchGui();
     void searchClose();
     void searchPhrase(QString*, Location*, Location*);
     void matchSelected(int);
     void resultsClose();
     void manualBookSelect(int);
-
+    void textClicked();
+    void setScroll(int, int);
 
     void close();
     void closeEvent(QCloseEvent *event);
 
     void gotoGui();
     void gotoClose();
-    void gotoLocation(Location*);
+    void dogoto(Location*);
+
+    void gotoLocation(Location*, int origId = -1);
 
     void nextBook();
     void prevBook();
@@ -81,7 +85,9 @@ private:
 
 signals:
     void newWin();
+    void moveSignal(Location*, int);
     void closedSignal(int);
+    void scrollSignal(int, int);
 };
 
 #endif // MAINWINDOW_H

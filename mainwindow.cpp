@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent, int ident) : QMainWindow(parent), ui(new
     connect(ui->manageTempl, SIGNAL(triggered()), this, SLOT(manageTemplGui()));
     connect(ui->quit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->openWindow, SIGNAL(triggered()), this, SLOT(openNewWindow()));
+    connect(ui->bibleText, SIGNAL(cursorPositionChanged()), this, SLOT(textClicked()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
     connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));
@@ -113,6 +114,21 @@ void MainWindow::moveCursor(int lineNum) {
     ui->bibleText->setTextCursor(cursor);
 }
 
+void MainWindow::textClicked() {
+    cout << ui->bibleText->verticalScrollBar()->value() << endl;
+    emit scrollSignal(ui->bibleText->verticalScrollBar()->value(), bookState);
+}
+
+void MainWindow::setScroll(int value, int bs) {
+    if(!ui->lockMove->checkState()) {
+        ui->bibleText->verticalScrollBar()->setValue(value);
+        if(bookState != bs) {
+            bookState = bs;
+            changeBook();
+        }
+    }
+}
+
 void MainWindow::searchGui() {
     if(!searchWindow && curBible) {
         searchWindow = new SearchDiag(0, this->curBible, &this->stempls);
@@ -147,13 +163,8 @@ void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLo
 }
 
 void MainWindow::matchSelected(int lineNum) {
-    Location newLoc = this->curBible->getLocation(lineNum);
-    bookState = newLoc.bookIdx;
-    this->changeBook();
-
-    int relLineNum = lineNum - curBible->getBookInfo(bookState).getStartLine();
-
-    this->moveCursor(relLineNum);
+    Location *newLoc = new Location(this->curBible->getLocation(lineNum));
+    emit moveSignal(newLoc, windowId);
     delete resultsWindow;
     resultsWindow = NULL;
 }
@@ -166,7 +177,7 @@ void MainWindow::resultsClose() {
 void MainWindow::gotoGui() {
     if(!gotoWindow && curBible) {
         gotoWindow = new gotodiag(0, this->curBible);
-        connect(gotoWindow, SIGNAL(closedSignal(Location*)), this, SLOT(gotoLocation(Location*)));
+        connect(gotoWindow, SIGNAL(closedSignal(Location*)), this, SLOT(dogoto(Location*)));
         connect(gotoWindow, SIGNAL(closedSignalNP()), this, SLOT(gotoClose()));
         gotoWindow->show();
     }
@@ -177,15 +188,21 @@ void MainWindow::gotoClose() {
     gotoWindow = NULL;
 }
 
-void MainWindow::gotoLocation(Location* newLoc) {
-    bookState = newLoc->bookIdx;
-    this->changeBook();
-
-    int relLineNum = newLoc->lineNum - curBible->getBookInfo(bookState).getStartLine();
-
-    this->moveCursor(relLineNum);
+void MainWindow::dogoto(Location* newLoc) {
+    emit moveSignal(newLoc, windowId);
     delete gotoWindow;
     gotoWindow = NULL;
+}
+
+void MainWindow::gotoLocation(Location* newLoc, int origId) {
+    if(!ui->lockMove->checkState() || origId == windowId) {
+        bookState = newLoc->bookIdx;
+        this->changeBook();
+
+        int relLineNum = newLoc->lineNum - curBible->getBookInfo(bookState).getStartLine();
+
+        this->moveCursor(relLineNum);
+    }
 }
 
 void MainWindow::nextBook() {

@@ -20,7 +20,8 @@ void Control::newWindow() {
         if(mw) {
             connect(mw, SIGNAL(newWin()), this, SLOT(newWindow()));
             connect(mw, SIGNAL(closedSignal(int)), this, SLOT(closeWindow(int)));
-
+            connect(mw, SIGNAL(moveSignal(Location*, int)), this, SLOT(moveAll(Location*, int)));
+            connect(mw, SIGNAL(scrollSignal(int, int)), this, SLOT(scrollAll(int, int)));
             mw->show();
         }
     }
@@ -28,6 +29,22 @@ void Control::newWindow() {
 
 void Control::closeWindow(int id) {
     mwList.rem(id);
+}
+
+void Control::moveAll(Location* newLoc, int id) {
+    for(int i = 0; i < mwList.max(); i++) {
+        if(mwList.get(i)) {
+            mwList.get(i)->gotoLocation(newLoc, id);
+        }
+    }
+}
+
+void Control::scrollAll(int value, int bs) {
+    for(int i = 0; i < mwList.max(); i++) {
+        if(mwList.get(i)) {
+            mwList.get(i)->setScroll(value, bs);
+        }
+    }
 }
 
 

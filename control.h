@@ -28,6 +28,9 @@ private:
     MainWindow *mw_1 = NULL;
 };
 
+
+//Control
+
 class Control : public QMainWindow
 {
     Q_OBJECT
@@ -39,6 +42,8 @@ public:
 public slots:
     void newWindow();
     void closeWindow(int);
+    void moveAll(Location*, int);
+    void scrollAll(int, int);
 
 private:
 
