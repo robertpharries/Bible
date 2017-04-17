@@ -23,10 +23,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0, int ident = -1);
     ~MainWindow();
 
 public slots:
+    void openNewWindow();
+
     void loadBible();
     void searchGui();
     void searchClose();
@@ -35,6 +37,8 @@ public slots:
     void resultsClose();
     void manualBookSelect(int);
 
+
+    void close();
     void closeEvent(QCloseEvent *event);
 
     void gotoGui();
@@ -57,6 +61,7 @@ public slots:
 private:
     void moveCursor(int);
     void changeBook();
+    int windowId = -1;
     Ui::MainWindow *ui;
     SearchDiag *searchWindow = NULL;
     ResultsDiag *resultsWindow = NULL;
@@ -73,6 +78,10 @@ private:
     std::vector<QString> fonts;
     //list of search templates
     std::vector<SearchTempl> stempls;
+
+signals:
+    void newWin();
+    void closedSignal(int);
 };
 
 #endif // MAINWINDOW_H

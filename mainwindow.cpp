@@ -4,13 +4,12 @@
 
 void outputLocation(BibleRec* curBible, int lineNum) {
     Location curLoc = curBible->getLocation(lineNum);
-
-    cout << "LineNum: " << curLoc.lineNum << " Book: " << curLoc.bookName << " Chapter: " << curLoc.chapter+1 << " Verse: " << curLoc.verse+1 << endl;
-    cout << endl;
 }
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget *parent, int ident) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
+    windowId = ident;
 
     ui->bibleText->setReadOnly(true);
 
@@ -30,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->fontSettings, SIGNAL(triggered()), this, SLOT(fontGui()));
     connect(ui->manageTempl, SIGNAL(triggered()), this, SLOT(manageTemplGui()));
     connect(ui->quit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->openWindow, SIGNAL(triggered()), this, SLOT(openNewWindow()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
     connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));
@@ -50,13 +50,20 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         resultsWindow->close();
     if(gotoWindow)
         gotoWindow->close();
+
+    emit closedSignal(windowId);
     event->accept();
 }
 
-void MainWindow::loadBible() {
-//    string name = "niv";
-//    curBible = new BibleRec(name + ".txt", "./" + name + ".idx");
+void MainWindow::close() {
 
+}
+
+void MainWindow::openNewWindow() {
+    emit newWin();
+}
+
+void MainWindow::loadBible() {
     QString filter = "Bible Text File (*.btx)";
     QString selection = QFileDialog::getOpenFileName(this, "Select a Bible text", QDir::currentPath(),filter);
     string str = selection.toStdString();
@@ -121,7 +128,6 @@ void MainWindow::searchClose() {
 }
 
 void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLoc) {
-    cout << "searching..." << endl;
     delete searchWindow;
     searchWindow = NULL;
 
@@ -131,10 +137,6 @@ void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLo
         msgBox.setText("No Matches Found.");
         msgBox.exec();
     } else {
-        for(int i = 0; i < matched.size(); i++) {
-            cout << matched.at(i) << endl;
-            outputLocation(curBible, matched.at(i));
-        }
         if(!resultsWindow) {
             resultsWindow = new ResultsDiag(0, this->curBible, &matched, phrase->toStdString());
             connect(resultsWindow, SIGNAL(selectedSignal(int)), this, SLOT(matchSelected(int)));
@@ -145,10 +147,7 @@ void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLo
 }
 
 void MainWindow::matchSelected(int lineNum) {
-    cout << lineNum << endl;
-
     Location newLoc = this->curBible->getLocation(lineNum);
-    cout << newLoc.bookIdx << endl;
     bookState = newLoc.bookIdx;
     this->changeBook();
 
@@ -182,12 +181,7 @@ void MainWindow::gotoLocation(Location* newLoc) {
     bookState = newLoc->bookIdx;
     this->changeBook();
 
-    cout << newLoc->lineNum << endl;
-    cout << curBible->getBookInfo(bookState).getStartLine() << endl;
-
     int relLineNum = newLoc->lineNum - curBible->getBookInfo(bookState).getStartLine();
-
-    cout << relLineNum << endl;
 
     this->moveCursor(relLineNum);
     delete gotoWindow;
@@ -201,7 +195,6 @@ void MainWindow::nextBook() {
             this->bookState++;
         }
 
-        cout << this->bookState << endl;
         this->changeBook();
     }
 }
@@ -213,7 +206,6 @@ void MainWindow::prevBook() {
             this->bookState--;
         }
 
-        cout << this->bookState << endl;
         this->changeBook();
     }
 }

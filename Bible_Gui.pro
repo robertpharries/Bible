@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     gotodiag.cpp \
     fontdialog.cpp \
     searchtemplnamediag.cpp \
-    managetempldiag.cpp
+    managetempldiag.cpp \
+    control.cpp
 
 HEADERS  += mainwindow.h \
     bible.h \
@@ -32,7 +33,8 @@ HEADERS  += mainwindow.h \
     gotodiag.h \
     fontdialog.h \
     searchtemplnamediag.h \
-    managetempldiag.h
+    managetempldiag.h \
+    control.h
 
 FORMS    += mainwindow.ui \
     searchdiag.ui \

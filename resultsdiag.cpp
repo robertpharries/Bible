@@ -86,12 +86,12 @@ void ResultsDiag::select() {
     QModelIndex index = indexes.at(0);
     int curRow = index.row();
     int lineNum = resultsList->at(curRow);
-    cout << lineNum << endl;
+//    cout << lineNum << endl;
     emit selectedSignal(lineNum);
 }
 
 void ResultsDiag::select(int row, int col) {
-    cout << row << endl;
+//    cout << row << endl;
     int lineNum = resultsList->at(row);
     emit selectedSignal(lineNum);
 }

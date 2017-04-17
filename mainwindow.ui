@@ -136,6 +136,7 @@
      <string>File</string>
     </property>
     <addaction name="openBible"/>
+    <addaction name="openWindow"/>
     <addaction name="separator"/>
     <addaction name="quit"/>
    </widget>
@@ -205,6 +206,11 @@
   <action name="manageTempl">
    <property name="text">
     <string>Manage Saved Searches</string>
+   </property>
+  </action>
+  <action name="openWindow">
+   <property name="text">
+    <string>Open New Window</string>
    </property>
   </action>
  </widget>
