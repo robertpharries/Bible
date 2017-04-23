@@ -11,8 +11,6 @@
 #include "searchdiag.h"
 #include "resultsdiag.h"
 #include "gotodiag.h"
-#include "fontdialog.h"
-#include "managetempldiag.h"
 #include "bible.h"
 
 namespace Ui {
@@ -53,14 +51,11 @@ public slots:
     void prevBook();
 
     void fontGui();
-    void fontClose();
-    void setFont(QString, int);
+    void setFont(QFont);
 
     void manageTemplGui();
-    void manageTemplClose();
-
-    void saveConf();
-    void loadConf();
+    void setTemplList(std::vector<SearchTempl>);
+    void addedTempl(SearchTempl);
 
 private:
     void moveCursor(int);
@@ -70,16 +65,12 @@ private:
     SearchDiag *searchWindow = NULL;
     ResultsDiag *resultsWindow = NULL;
     gotodiag *gotoWindow = NULL;
-    FontDialog *fontWindow = NULL;
-    ManageTemplDiag *manageTemplWindow = NULL;
 
     BibleRec *curBible = NULL;
 
     //remembers the current book displayed
     int bookState;
 
-    //list of fonts availble
-    std::vector<QString> fonts;
     //list of search templates
     std::vector<SearchTempl> stempls;
 
@@ -88,6 +79,9 @@ signals:
     void moveSignal(Location*, int);
     void closedSignal(int);
     void scrollSignal(int, int);
+    void fontGuiSignal();
+    void manageTemplSignal();
+    void addedTemplSignal(SearchTempl);
 };
 
 #endif // MAINWINDOW_H

@@ -13,15 +13,8 @@ MainWindow::MainWindow(QWidget *parent, int ident) : QMainWindow(parent), ui(new
 
     ui->bibleText->setReadOnly(true);
 
-    this->loadConf();
-
     //setup actions
     this->bookState = 0;
-
-    this->fonts.push_back(QString("Arial"));
-    this->fonts.push_back(QString("Courier New"));
-    this->fonts.push_back(QString("Helvetica"));
-    this->fonts.push_back(QString("Times New Roman"));
 
     connect(ui->openBible, SIGNAL(triggered()), this, SLOT(loadBible()));
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
@@ -39,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent, int ident) : QMainWindow(parent), ui(new
 }
 
 MainWindow::~MainWindow() {
-    this->saveConf();
     delete curBible;
     delete ui;
 }
@@ -132,6 +124,7 @@ void MainWindow::setScroll(int value, int bs) {
 void MainWindow::searchGui() {
     if(!searchWindow && curBible) {
         searchWindow = new SearchDiag(0, this->curBible, &this->stempls);
+        connect(searchWindow, SIGNAL(addedTempl(SearchTempl)), this, SLOT(addedTempl(SearchTempl)));
         connect(searchWindow, SIGNAL(closedSignal(QString*, Location*, Location*)), this, SLOT(searchPhrase(QString*, Location*, Location*)));
         connect(searchWindow, SIGNAL(closedSignalNP()), this, SLOT(searchClose()));
         searchWindow->show();
@@ -275,103 +268,21 @@ void MainWindow::manualBookSelect(int index) {
 }
 
 void MainWindow::fontGui() {
-    if(!fontWindow) {
-        fontWindow = new FontDialog(0, &this->fonts);
-        connect(fontWindow, SIGNAL(closedSignal(QString,int)), this, SLOT(setFont(QString,int)));
-        connect(fontWindow, SIGNAL(closedSignalNP()), this, SLOT(fontClose()));
-        fontWindow->show();
-    }
+    emit fontGuiSignal();
 }
 
-void MainWindow::fontClose() {
-    if(fontWindow) {
-        delete fontWindow;
-        fontWindow = NULL;
-    }
-}
-
-void MainWindow::setFont(QString fontFamily, int fontSize) {
-    QFont font;
-    font.setFamily(fontFamily);
-    font.setPointSize(fontSize);
-
+void MainWindow::setFont(QFont font) {
     ui->bibleText->setFont(font);
-
-    if(fontWindow) {
-        delete fontWindow;
-        fontWindow = NULL;
-    }
 }
 
 void MainWindow::manageTemplGui() {
-    if(!manageTemplWindow) {
-        manageTemplWindow = new ManageTemplDiag(0, curBible, &stempls);
-        connect(manageTemplWindow, SIGNAL(closedSignalNP()), this, SLOT(manageTemplClose()));
-        manageTemplWindow->show();
-    }
+    emit manageTemplSignal();
 }
 
-void MainWindow::manageTemplClose() {
-    if(manageTemplWindow) {
-        delete manageTemplWindow;
-        manageTemplWindow = NULL;
-    }
+void MainWindow::setTemplList(std::vector<SearchTempl> templList) {
+    stempls = templList;
 }
 
-void MainWindow::loadConf() {
-    ifstream confins;
-    QFont font;
-    confins.open("Bible_Gui.conf");
-
-    char buffer[128];
-    confins.getline(buffer, 128, '\n');
-
-    font.setFamily(QString(buffer));
-
-    confins.getline(buffer, 128, '\n');
-    font.setPointSize(atoi(buffer));
-
-    ui->bibleText->setFont(font);
-
-    //go load the templates
-    SearchTempl temp;
-    temp = (SearchTempl) {"Entire Bible", 0, 1, 1, 65, 22, 21};
-    stempls.push_back(temp);
-    temp = (SearchTempl) {"Old Testament", 0, 1, 1, 38, 4, 6};
-    stempls.push_back(temp);
-    temp = (SearchTempl) {"New Testament", 39, 1, 1, 65, 22, 21};
-    stempls.push_back(temp);
-
-    confins.getline(buffer, 128, '\n');
-
-    int templNum = atoi(buffer);
-
-    for(int i = 0; i < templNum; i++) {
-        string name;
-        int a, b, c, d, e, f;
-
-        confins >> name >> a >> b >> c >> d >> e >> f;
-
-        temp = (SearchTempl) {name,a,b,c,d,e,f};
-
-        stempls.push_back(temp);
-    }
-
-}
-
-void MainWindow::saveConf() {
-    ofstream confos;
-    confos.open("Bible_Gui.conf", ios::trunc);
-
-    confos << ui->bibleText->font().family().toStdString() << '\n' << ui->bibleText->font().pointSize() << endl;
-
-    if(stempls.size()-3 > 0) {
-        confos << stempls.size()-3 << endl;
-
-        for(int i = 0; i < stempls.size()-3; i++) {
-            confos << stempls.at(i+3).name << " " << stempls.at(i+3).f_bookIdx << " " << stempls.at(i+3).f_chapter << " " << stempls.at(i+3).f_verse << " "<< stempls.at(i+3).t_bookIdx << " " << stempls.at(i+3).t_chapter << " " << stempls.at(i+3).t_verse << endl;
-        }
-    }
-
-    confos.close();
+void MainWindow::addedTempl(SearchTempl addedTempl) {
+    emit addedTemplSignal(addedTempl);
 }

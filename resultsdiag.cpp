@@ -16,14 +16,6 @@ ResultsDiag::ResultsDiag(QWidget *parent, BibleRec *newBible, vector<int> *match
 
     ui->previewEdit->setReadOnly(true);
 
-//    for(int i = 0; i < resultsList->size(); ++i) {
-//        TextSec matchedLine = curBible->getText(resultsList->at(i), resultsList->at(i)+1);
-//        cout << matchedLine.sec.at(0) << endl;
-//        Location curLoc = curBible->getLocation(resultsList->at(i));
-//        cout << "Book: " << curLoc.bookName << " Chapter: " << curLoc.chapter+1 << " Verse: " << curLoc.verse+1 << endl;
-//        cout << endl;
-//    }
-
     for(int i = 0; i < resultsList->size(); i++) {
         Location curLoc = curBible->getLocation(resultsList->at(i));
         std::ostringstream chapt;
@@ -51,7 +43,7 @@ ResultsDiag::ResultsDiag(QWidget *parent, BibleRec *newBible, vector<int> *match
     ui->resultNumLabel->setText(QString::number(matched->size()));
 
     connect(ui->resultTable, SIGNAL(itemSelectionChanged()), SLOT(changePreview()));
-    connect(ui->resultTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(select(int, int)));
+    //connect(ui->resultTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(select(int, int)));
     connect(ui->selectBtn, SIGNAL(clicked(bool)), SLOT(select()));
     connect(ui->cancelBtn, SIGNAL(clicked(bool)), SLOT(cancel()));
 }

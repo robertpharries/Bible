@@ -5,6 +5,8 @@
 #include "mainwindow.h"
 #include <vector>
 #include <string>
+#include "fontdialog.h"
+#include "managetempldiag.h"
 
 const static int WINDOW_LIMIT = 2;
 
@@ -17,6 +19,7 @@ public:
     MainWindow* get(int id);
     void rem(int id);
     bool hasFree();
+    int count();
     int max();
 
 private:
@@ -45,11 +48,33 @@ public slots:
     void moveAll(Location*, int);
     void scrollAll(int, int);
 
+    void fontGui();
+    void fontClose();
+    void setFontAll(QString, int);
+
+    void manageTemplGui();
+    void manageTemplClose();
+    void setTemplAll();
+    void addedTempl(SearchTempl);
+
+    void saveConf();
+    void loadConf();
+
 private:
 
     windowControl mwList;
 
     long inc = 0;
+
+    FontDialog *fontWindow = NULL;
+    ManageTemplDiag *manageTemplWindow = NULL;
+
+    //fonts
+    std::vector<QString> fonts;
+    QFont currentFont;
+
+    //templates
+    std::vector<SearchTempl> stempls;
 };
 
 #endif // CONTROL_H

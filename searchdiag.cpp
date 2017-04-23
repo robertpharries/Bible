@@ -131,16 +131,20 @@ void SearchDiag::setTempl(int index) {
 void SearchDiag::doSaveTempl() {
     if(!saveDiag) {
         saveDiag = new SearchTemplNameDiag();
-        connect(saveDiag, SIGNAL(closedSignal(QString*)), this, SLOT(savePhrase(QString*)));
+        connect(saveDiag, SIGNAL(closedSignal(QString*)), this, SLOT(saveTempl(QString*)));
         connect(saveDiag, SIGNAL(closedSignalNP()), this, SLOT(saveClose()));
         saveDiag->show();
     }
 }
 
-void SearchDiag::savePhrase(QString* name) {
+void SearchDiag::saveTempl(QString* name) {
     if(stempl->size() < 50) {
-        SearchTempl temp = (SearchTempl) {name->toStdString(), ui->fromBook->currentIndex(), ui->fromChp->value(), ui->fromVrs->value(), ui->toBook->currentIndex(), ui->toChp->value(), ui->toVrs->value() };
+        Location f_curLoc = curBible->getLocation(ui->fromBook->currentIndex(), ui->fromChp->value(), ui->fromVrs->value());
+        Location t_curLoc = curBible->getLocation(ui->toBook->currentIndex(), ui->toChp->value(), ui->toVrs->value());
+
+        SearchTempl temp = (SearchTempl) {name->toStdString(), f_curLoc.bookName, t_curLoc.bookName, ui->fromBook->currentIndex(), ui->fromChp->value(), ui->fromVrs->value(), ui->toBook->currentIndex(), ui->toChp->value(), ui->toVrs->value() };
         stempl->push_back(temp);
+        emit addedTempl(temp);
     }
 
     loadTempl(stempl->size()+2);
