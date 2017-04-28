@@ -33,6 +33,7 @@ Book BibleRec::getBookInfo(int bookId) {
 	return curIdx->getBook(bookId);
 }
 
+//faster for just one string
 vector<int> BibleRec::searchPhrase(string phrase, int start, int end) {
     vector<int> matchList;
 
@@ -45,6 +46,112 @@ vector<int> BibleRec::searchPhrase(string phrase, int start, int end) {
 	}
 
 	return matchList;
+}
+
+//used for multiple phrases, but can be used for loose search as you just make the words phrases
+vector<int> BibleRec::searchPhrasesAND(vector<string> phrases, int start, int end) {
+    vector<int> matchList;
+
+    TextSec selection = this->getText(start, end);
+    bool isin;
+
+    for(int i = 0; i < selection.len; ++i) {
+        isin = true;
+        for(int n = 0; n < phrases.size(); n++) {
+            if(selection.sec.at(i).find(phrases.at(n)) == string::npos) {
+                isin = false;
+            }
+        }
+
+        if(isin) {
+            matchList.push_back(i + selection.lineStart);
+        }
+    }
+
+    return matchList;
+}
+
+//mb not a good idea due to amount of results
+vector<int> BibleRec::searchPhrasesOR(vector<string> phrases, int start, int end) {
+    vector<int> matchList;
+
+    TextSec selection = this->getText(start, end);
+    bool isin;
+
+    for(int i = 0; i < selection.len; ++i) {
+        isin = false;
+        for(int n = 0; n < phrases.size(); n++) {
+            if(selection.sec.at(i).find(phrases.at(n)) != string::npos) {
+                isin = true;
+            }
+        }
+
+        if(isin) {
+            matchList.push_back(i + selection.lineStart);
+        }
+    }
+
+    return matchList;
+}
+
+//good if you cant remember how the phrase went
+vector<int> BibleRec::searchPhrasesXOR(vector<string> phrases, int start, int end) {
+    vector<int> matchList;
+
+    TextSec selection = this->getText(start, end);
+    bool isin;
+
+    for(int i = 0; i < selection.len; ++i) {
+        isin = false;
+        for(int n = 0; n < phrases.size(); n++) {
+            if(selection.sec.at(i).find(phrases.at(n)) != string::npos) {
+                if(isin == false)
+                    isin = true;
+                else {
+                    isin = false;
+                    break;
+                }
+            }
+        }
+
+        if(isin) {
+            matchList.push_back(i + selection.lineStart);
+        }
+    }
+
+    return matchList;
+}
+
+//mb not a good idea due to amount of results
+vector<int> BibleRec::searchPhrasesNOR(vector<string> phrases, vector<string> exclude, int start, int end) {
+    vector<int> matchList;
+
+    TextSec selection = this->getText(start, end);
+    bool isin;
+
+    for(int i = 0; i < selection.len; ++i) {
+        isin = false;
+        //if any of the phrases, say its in
+        for(int n = 0; n < phrases.size(); n++) {
+            if(selection.sec.at(i).find(phrases.at(n)) != string::npos) {
+                isin = true;
+                break;
+            }
+        }
+        //then check if the excludes are in there, if they are, say its not a match
+        for(int m = 0; m < exclude.size(); m++) {
+            if(selection.sec.at(i).find(exclude.at(m)) != string::npos) {
+                isin = false;
+                break;
+            }
+        }
+
+        if(isin) {
+            matchList.push_back(i + selection.lineStart);
+        }
+    }
+
+    return matchList;
 }
 
 Location BibleRec::getLocation(int lineNum) {

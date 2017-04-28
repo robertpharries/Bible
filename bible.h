@@ -89,6 +89,11 @@ public:
 
     vector<int> searchPhrase(string, int, int);
 	Location getLocation(int);
+
+    vector<int> searchPhrasesAND(vector<string>, int, int);
+    vector<int> searchPhrasesOR(vector<string>, int, int);
+    vector<int> searchPhrasesXOR(vector<string>, int, int);
+    vector<int> searchPhrasesNOR(vector<string>, vector<string>, int, int);
 private:
 	BibleIdx* curIdx;
 	BibleText* curText;
