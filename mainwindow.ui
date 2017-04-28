@@ -146,6 +146,7 @@
     <addaction name="copySelection"/>
     <addaction name="separator"/>
     <addaction name="fontSettings"/>
+    <addaction name="manageTempl"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -199,6 +200,11 @@
   <action name="fontSettings">
    <property name="text">
     <string>Font Settings</string>
+   </property>
+  </action>
+  <action name="manageTempl">
+   <property name="text">
+    <string>Manage Saved Searches</string>
    </property>
   </action>
  </widget>

@@ -56,6 +56,7 @@ public:
 	int getEndLine();
     Location getLocation(int); //get location by line position
     int getLineNum(Location); //get line number by location, needs only bookIdx, chapter, verse
+    Location getLocation(int, int, int);
 private:
 	string name;
     int startLine = 0, endLine = 0;
@@ -70,7 +71,9 @@ public:
     vector<string>* getList();
     int getBookNum();
 	Book getBook(int);
-	Location getLocation(int);
+
+    Location getLocation(int);              //by line
+    Location getLocation(int, int, int);    //by bookidx, chapt, verse
 private:
     int numBooks = 0;
 	vector<Book> bookList;
@@ -88,12 +91,16 @@ public:
 	Book getBookInfo(int);
 
     vector<int> searchPhrase(string, int, int);
+
 	Location getLocation(int);
 
     vector<int> searchPhrasesAND(vector<string>, int, int);
     vector<int> searchPhrasesOR(vector<string>, int, int);
     vector<int> searchPhrasesXOR(vector<string>, int, int);
     vector<int> searchPhrasesNOR(vector<string>, vector<string>, int, int);
+
+    Location getLocation(int, int, int);
+
 private:
 	BibleIdx* curIdx;
 	BibleText* curText;

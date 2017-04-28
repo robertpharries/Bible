@@ -21,19 +21,25 @@ SOURCES += main.cpp\
     searchdiag.cpp \
     resultsdiag.cpp \
     gotodiag.cpp \
-    fontdialog.cpp
+    fontdialog.cpp \
+    searchtemplnamediag.cpp \
+    managetempldiag.cpp
 
 HEADERS  += mainwindow.h \
     bible.h \
     searchdiag.h \
     resultsdiag.h \
     gotodiag.h \
-    fontdialog.h
+    fontdialog.h \
+    searchtemplnamediag.h \
+    managetempldiag.h
 
 FORMS    += mainwindow.ui \
     searchdiag.ui \
     resultsdiag.ui \
     gotodiag.ui \
-    fontdialog.ui
+    fontdialog.ui \
+    searchtemplnamediag.ui \
+    managetempldiag.ui
 
 DISTFILES +=
