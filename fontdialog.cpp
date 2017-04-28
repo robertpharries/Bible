@@ -1,7 +1,7 @@
 #include "fontdialog.h"
 #include "ui_fontdialog.h"
 
-FontDialog::FontDialog(QWidget *parent, vector<QString>* fonts) : QDialog(parent), ui(new Ui::FontDialog) {
+FontDialog::FontDialog(QWidget *parent, vector<QString>* fonts, QFont *curFont) : QDialog(parent), ui(new Ui::FontDialog) {
     ui->setupUi(this);
 
     this->fontsList = fonts;
@@ -32,8 +32,6 @@ FontDialog::FontDialog(QWidget *parent, vector<QString>* fonts) : QDialog(parent
             }
         }
 
-        cout << line << endl;
-
         temp.append("<p>");
         temp.append(line.c_str());
         temp.append("</p>");
@@ -45,11 +43,17 @@ FontDialog::FontDialog(QWidget *parent, vector<QString>* fonts) : QDialog(parent
     connect(ui->fontList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(doChange()));
     connect(ui->fontSize, SIGNAL(valueChanged(int)), this, SLOT(doChange()));
 
+    int idx = 0;
     for(int i = 0; i < fontsList->size(); i++) {
         ui->fontList->addItem(fontsList->at(i));
+        if(fontsList->at(i) == curFont->family()) {
+            idx = i;
+        }
     }
 
-    ui->fontSize->setValue(10);
+    ui->fontList->setCurrentRow(idx);
+
+    ui->fontSize->setValue(curFont->pointSize());
 }
 
 FontDialog::~FontDialog(){

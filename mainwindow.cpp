@@ -4,25 +4,17 @@
 
 void outputLocation(BibleRec* curBible, int lineNum) {
     Location curLoc = curBible->getLocation(lineNum);
-
-    cout << "LineNum: " << curLoc.lineNum << " Book: " << curLoc.bookName << " Chapter: " << curLoc.chapter+1 << " Verse: " << curLoc.verse+1 << endl;
-    cout << endl;
 }
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget *parent, int ident) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
+    windowId = ident;
 
     ui->bibleText->setReadOnly(true);
 
-    this->loadConf();
-
     //setup actions
     this->bookState = 0;
-
-    this->fonts.push_back(QString("Arial"));
-    this->fonts.push_back(QString("Courier New"));
-    this->fonts.push_back(QString("Helvetica"));
-    this->fonts.push_back(QString("Times New Roman"));
 
     connect(ui->openBible, SIGNAL(triggered()), this, SLOT(loadBible()));
     connect(ui->search, SIGNAL(triggered()), this, SLOT(searchGui()));
@@ -30,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->fontSettings, SIGNAL(triggered()), this, SLOT(fontGui()));
     connect(ui->manageTempl, SIGNAL(triggered()), this, SLOT(manageTemplGui()));
     connect(ui->quit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->openWindow, SIGNAL(triggered()), this, SLOT(openNewWindow()));
+    connect(ui->bibleText, SIGNAL(cursorPositionChanged()), this, SLOT(textClicked()));
 
     connect(ui->bookCtrlNext, SIGNAL(pressed()), this, SLOT(nextBook()));
     connect(ui->bookCtrlBack, SIGNAL(pressed()), this, SLOT(prevBook()));
@@ -38,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
-    this->saveConf();
     delete curBible;
     delete ui;
 }
@@ -50,13 +43,20 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         resultsWindow->close();
     if(gotoWindow)
         gotoWindow->close();
+
+    emit closedSignal(windowId);
     event->accept();
 }
 
-void MainWindow::loadBible() {
-//    string name = "niv";
-//    curBible = new BibleRec(name + ".txt", "./" + name + ".idx");
+void MainWindow::close() {
 
+}
+
+void MainWindow::openNewWindow() {
+    emit newWin();
+}
+
+void MainWindow::loadBible() {
     QString filter = "Bible Text File (*.btx)";
     QString selection = QFileDialog::getOpenFileName(this, "Select a Bible text", QDir::currentPath(),filter);
     string str = selection.toStdString();
@@ -106,9 +106,25 @@ void MainWindow::moveCursor(int lineNum) {
     ui->bibleText->setTextCursor(cursor);
 }
 
+void MainWindow::textClicked() {
+    cout << ui->bibleText->verticalScrollBar()->value() << endl;
+    emit scrollSignal(ui->bibleText->verticalScrollBar()->value(), bookState);
+}
+
+void MainWindow::setScroll(int value, int bs) {
+    if(!ui->lockMove->checkState()) {
+        ui->bibleText->verticalScrollBar()->setValue(value);
+        if(bookState != bs) {
+            bookState = bs;
+            changeBook();
+        }
+    }
+}
+
 void MainWindow::searchGui() {
     if(!searchWindow && curBible) {
         searchWindow = new SearchDiag(0, this->curBible, &this->stempls);
+        connect(searchWindow, SIGNAL(addedTempl(SearchTempl)), this, SLOT(addedTempl(SearchTempl)));
         connect(searchWindow, SIGNAL(closedSignal(QString*, Location*, Location*)), this, SLOT(searchPhrase(QString*, Location*, Location*)));
         connect(searchWindow, SIGNAL(closedSignalNP()), this, SLOT(searchClose()));
         searchWindow->show();
@@ -121,7 +137,6 @@ void MainWindow::searchClose() {
 }
 
 void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLoc) {
-    cout << "searching..." << endl;
     delete searchWindow;
     searchWindow = NULL;
 
@@ -131,10 +146,6 @@ void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLo
         msgBox.setText("No Matches Found.");
         msgBox.exec();
     } else {
-        for(int i = 0; i < matched.size(); i++) {
-            cout << matched.at(i) << endl;
-            outputLocation(curBible, matched.at(i));
-        }
         if(!resultsWindow) {
             resultsWindow = new ResultsDiag(0, this->curBible, &matched, phrase->toStdString());
             connect(resultsWindow, SIGNAL(selectedSignal(int)), this, SLOT(matchSelected(int)));
@@ -145,16 +156,8 @@ void MainWindow::searchPhrase(QString *phrase, Location *fromLoc, Location *toLo
 }
 
 void MainWindow::matchSelected(int lineNum) {
-    cout << lineNum << endl;
-
-    Location newLoc = this->curBible->getLocation(lineNum);
-    cout << newLoc.bookIdx << endl;
-    bookState = newLoc.bookIdx;
-    this->changeBook();
-
-    int relLineNum = lineNum - curBible->getBookInfo(bookState).getStartLine();
-
-    this->moveCursor(relLineNum);
+    Location *newLoc = new Location(this->curBible->getLocation(lineNum));
+    emit moveSignal(newLoc, windowId);
     delete resultsWindow;
     resultsWindow = NULL;
 }
@@ -167,7 +170,7 @@ void MainWindow::resultsClose() {
 void MainWindow::gotoGui() {
     if(!gotoWindow && curBible) {
         gotoWindow = new gotodiag(0, this->curBible);
-        connect(gotoWindow, SIGNAL(closedSignal(Location*)), this, SLOT(gotoLocation(Location*)));
+        connect(gotoWindow, SIGNAL(closedSignal(Location*)), this, SLOT(dogoto(Location*)));
         connect(gotoWindow, SIGNAL(closedSignalNP()), this, SLOT(gotoClose()));
         gotoWindow->show();
     }
@@ -178,20 +181,21 @@ void MainWindow::gotoClose() {
     gotoWindow = NULL;
 }
 
-void MainWindow::gotoLocation(Location* newLoc) {
-    bookState = newLoc->bookIdx;
-    this->changeBook();
-
-    cout << newLoc->lineNum << endl;
-    cout << curBible->getBookInfo(bookState).getStartLine() << endl;
-
-    int relLineNum = newLoc->lineNum - curBible->getBookInfo(bookState).getStartLine();
-
-    cout << relLineNum << endl;
-
-    this->moveCursor(relLineNum);
+void MainWindow::dogoto(Location* newLoc) {
+    emit moveSignal(newLoc, windowId);
     delete gotoWindow;
     gotoWindow = NULL;
+}
+
+void MainWindow::gotoLocation(Location* newLoc, int origId) {
+    if(!ui->lockMove->checkState() || origId == windowId) {
+        bookState = newLoc->bookIdx;
+        this->changeBook();
+
+        int relLineNum = newLoc->lineNum - curBible->getBookInfo(bookState).getStartLine();
+
+        this->moveCursor(relLineNum);
+    }
 }
 
 void MainWindow::nextBook() {
@@ -201,7 +205,6 @@ void MainWindow::nextBook() {
             this->bookState++;
         }
 
-        cout << this->bookState << endl;
         this->changeBook();
     }
 }
@@ -213,7 +216,6 @@ void MainWindow::prevBook() {
             this->bookState--;
         }
 
-        cout << this->bookState << endl;
         this->changeBook();
     }
 }
@@ -266,103 +268,21 @@ void MainWindow::manualBookSelect(int index) {
 }
 
 void MainWindow::fontGui() {
-    if(!fontWindow) {
-        fontWindow = new FontDialog(0, &this->fonts);
-        connect(fontWindow, SIGNAL(closedSignal(QString,int)), this, SLOT(setFont(QString,int)));
-        connect(fontWindow, SIGNAL(closedSignalNP()), this, SLOT(fontClose()));
-        fontWindow->show();
-    }
+    emit fontGuiSignal();
 }
 
-void MainWindow::fontClose() {
-    if(fontWindow) {
-        delete fontWindow;
-        fontWindow = NULL;
-    }
-}
-
-void MainWindow::setFont(QString fontFamily, int fontSize) {
-    QFont font;
-    font.setFamily(fontFamily);
-    font.setPointSize(fontSize);
-
+void MainWindow::setFont(QFont font) {
     ui->bibleText->setFont(font);
-
-    if(fontWindow) {
-        delete fontWindow;
-        fontWindow = NULL;
-    }
 }
 
 void MainWindow::manageTemplGui() {
-    if(!manageTemplWindow) {
-        manageTemplWindow = new ManageTemplDiag(0, curBible, &stempls);
-        connect(manageTemplWindow, SIGNAL(closedSignalNP()), this, SLOT(manageTemplClose()));
-        manageTemplWindow->show();
-    }
+    emit manageTemplSignal();
 }
 
-void MainWindow::manageTemplClose() {
-    if(manageTemplWindow) {
-        delete manageTemplWindow;
-        manageTemplWindow = NULL;
-    }
+void MainWindow::setTemplList(std::vector<SearchTempl> templList) {
+    stempls = templList;
 }
 
-void MainWindow::loadConf() {
-    ifstream confins;
-    QFont font;
-    confins.open("Bible_Gui.conf");
-
-    char buffer[128];
-    confins.getline(buffer, 128, '\n');
-
-    font.setFamily(QString(buffer));
-
-    confins.getline(buffer, 128, '\n');
-    font.setPointSize(atoi(buffer));
-
-    ui->bibleText->setFont(font);
-
-    //go load the templates
-    SearchTempl temp;
-    temp = (SearchTempl) {"Entire Bible", 0, 1, 1, 65, 22, 21};
-    stempls.push_back(temp);
-    temp = (SearchTempl) {"Old Testament", 0, 1, 1, 38, 4, 6};
-    stempls.push_back(temp);
-    temp = (SearchTempl) {"New Testament", 39, 1, 1, 65, 22, 21};
-    stempls.push_back(temp);
-
-    confins.getline(buffer, 128, '\n');
-
-    int templNum = atoi(buffer);
-
-    for(int i = 0; i < templNum; i++) {
-        string name;
-        int a, b, c, d, e, f;
-
-        confins >> name >> a >> b >> c >> d >> e >> f;
-
-        temp = (SearchTempl) {name,a,b,c,d,e,f};
-
-        stempls.push_back(temp);
-    }
-
-}
-
-void MainWindow::saveConf() {
-    ofstream confos;
-    confos.open("Bible_Gui.conf", ios::trunc);
-
-    confos << ui->bibleText->font().family().toStdString() << '\n' << ui->bibleText->font().pointSize() << endl;
-
-    if(stempls.size()-3 > 0) {
-        confos << stempls.size()-3 << endl;
-
-        for(int i = 0; i < stempls.size()-3; i++) {
-            confos << stempls.at(i+3).name << " " << stempls.at(i+3).f_bookIdx << " " << stempls.at(i+3).f_chapter << " " << stempls.at(i+3).f_verse << " "<< stempls.at(i+3).t_bookIdx << " " << stempls.at(i+3).t_chapter << " " << stempls.at(i+3).t_verse << endl;
-        }
-    }
-
-    confos.close();
+void MainWindow::addedTempl(SearchTempl addedTempl) {
+    emit addedTemplSignal(addedTempl);
 }

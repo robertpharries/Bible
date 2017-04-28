@@ -47,20 +47,11 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <widget class="QCheckBox" name="lockMove">
+          <property name="text">
+           <string>Lock Movement</string>
           </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::MinimumExpanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
         </item>
         <item>
          <widget class="QComboBox" name="bookSelector">
@@ -136,6 +127,7 @@
      <string>File</string>
     </property>
     <addaction name="openBible"/>
+    <addaction name="openWindow"/>
     <addaction name="separator"/>
     <addaction name="quit"/>
    </widget>
@@ -205,6 +197,11 @@
   <action name="manageTempl">
    <property name="text">
     <string>Manage Saved Searches</string>
+   </property>
+  </action>
+  <action name="openWindow">
+   <property name="text">
+    <string>Open New Window</string>
    </property>
   </action>
  </widget>

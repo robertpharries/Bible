@@ -15,7 +15,7 @@ class ManageTemplDiag : public QDialog
     Q_OBJECT
 
 public:
-    explicit ManageTemplDiag(QWidget *parent = 0, BibleRec *newBible = NULL, std::vector<SearchTempl> *newstempl = NULL);
+    explicit ManageTemplDiag(QWidget *parent = 0, std::vector<SearchTempl> *newstempl = NULL);
     ~ManageTemplDiag();
 
 public slots:
@@ -28,7 +28,6 @@ private:
     void closeEvent(QCloseEvent*);
     Ui::ManageTemplDiag *ui;
 
-    BibleRec *curBible;
     std::vector<SearchTempl> *stempl = NULL;
 
 signals:

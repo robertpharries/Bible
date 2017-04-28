@@ -14,7 +14,7 @@ class FontDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit FontDialog(QWidget *parent = 0, vector<QString> *fonts = NULL);
+    explicit FontDialog(QWidget *parent = 0, vector<QString> *fonts = NULL, QFont *curFont = NULL);
     ~FontDialog();
 
 public slots:

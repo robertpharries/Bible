@@ -167,7 +167,7 @@ Location BibleRec::getLocation(int bookIdx, int chapt, int verse) {
 
 BibleText::BibleText(string textPath) {
 	ifstream ins;
-    cout << textPath.c_str() << endl;
+
     ins.open(textPath.c_str());
     ins.clear();
     char buffer[512];

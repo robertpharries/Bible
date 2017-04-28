@@ -31,7 +31,7 @@ public slots:
 
     void doSaveTempl();
     void saveClose();
-    void savePhrase(QString*);
+    void saveTempl(QString*);
 
 private:
     void loadTempl(int);
@@ -45,6 +45,7 @@ private:
 signals:
     void closedSignalNP();
     void closedSignal(QString*, Location*, Location*);
+    void addedTempl(SearchTempl);
 };
 
 #endif // SEARCHDIAG_H

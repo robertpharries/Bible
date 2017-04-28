@@ -26,6 +26,8 @@ struct Location {
 
 struct SearchTempl {
     string name;
+    string f_bookName;
+    string t_bookName;
     int f_bookIdx;
     int f_chapter;
     int f_verse;
