@@ -5,6 +5,7 @@ ResultsDiag::ResultsDiag(QWidget *parent, BibleRec *newBible, vector<int> *match
     ui->setupUi(this);
     curBible = newBible;
     resultsList = new vector<int>(*matched);
+    clip = QApplication::clipboard();
 
     QStringList headers;
     headers << "Location" << "Sample";
@@ -46,6 +47,7 @@ ResultsDiag::ResultsDiag(QWidget *parent, BibleRec *newBible, vector<int> *match
     //connect(ui->resultTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(select(int, int)));
     connect(ui->selectBtn, SIGNAL(clicked(bool)), SLOT(select()));
     connect(ui->cancelBtn, SIGNAL(clicked(bool)), SLOT(cancel()));
+    connect(ui->copyAllBtn, SIGNAL(clicked(bool)), SLOT(copyAll()));
 }
 
 ResultsDiag::~ResultsDiag() {
@@ -86,6 +88,34 @@ void ResultsDiag::select(int row, int col) {
 //    cout << row << endl;
     int lineNum = resultsList->at(row);
     emit selectedSignal(lineNum);
+}
+
+void ResultsDiag::copyAll() {
+    QString dump = "";
+
+    for(int i = 0; i < resultsList->size(); i++) {
+        Location curLoc = curBible->getLocation(resultsList->at(i));
+        std::ostringstream chapt;
+        std::ostringstream vers;
+        chapt << curLoc.chapter+1;
+        vers << curLoc.verse+1;
+        QString locStr = (curLoc.bookName + " " + chapt.str() + ":" + vers.str()).c_str();
+        bool context = ui->contextChk->checkState();
+        if(context)
+            dump += locStr + ":\r\n";
+
+        int preContext = ui->preSpin->value();
+        int postContext = ui->postSpin->value();
+        TextSec matchedLines = curBible->getText(resultsList->at(i)-preContext, resultsList->at(i)+1+postContext);
+        for(int i = 0; i < matchedLines.sec.size(); i++) {
+            QString temp = matchedLines.sec.at(i).c_str();
+            temp = temp.left(temp.length() - 1);
+            dump += temp + "\r\n";
+        }
+        dump += "\r\n";
+
+        clip->setText(dump);
+    }
 }
 
 void ResultsDiag::cancel() {

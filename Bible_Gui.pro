@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT += webkitwidgets
 
 #CONFIG += console
 

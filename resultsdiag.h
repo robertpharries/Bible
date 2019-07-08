@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QTableWidget>
+#include <QClipboard>
 #include <string>
 #include <sstream>
 #include <cstdlib>
@@ -24,6 +25,7 @@ public slots:
     void changePreview();
     void select();
     void select(int, int);
+    void copyAll();
     void cancel();
 
 private:
@@ -32,6 +34,7 @@ private:
     Ui::ResultsDiag *ui;
     BibleRec *curBible = NULL;
     vector<int> *resultsList = NULL;
+    QClipboard *clip = NULL;
 
 signals:
     void selectedSignal(int);
